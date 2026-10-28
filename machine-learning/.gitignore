@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Machine Learning artifacts
+models/*.pkl
+models/*.joblib
+!models/sentiment_model.joblib
+
+# Data
+data/raw/
+data/processed/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/

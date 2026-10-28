@@ -1,204 +1,217 @@
-# IMDb Sentiment Analysis with PyTorch
+# IMDb Sentiment Analysis: Machine Learning vs Deep Learning
 
-A deep learning project that classifies IMDb movie reviews as **positive** or **negative** using an Embedding layer and an LSTM neural network built with PyTorch.
+A sentiment analysis project that compares two approaches to classifying IMDb movie reviews as **Positive** or **Negative**:
+
+- **Machine Learning:** TF-IDF + Logistic Regression
+- **Deep Learning:** PyTorch + LSTM
+
+The repository contains two independent implementations of the same sentiment analysis task, allowing their architectures, evaluation results, and practical trade-offs to be explored.
 
 ## Overview
 
-This project uses a Long Short-Term Memory (LSTM) network to perform sentiment analysis on movie reviews.
+Sentiment analysis is a Natural Language Processing (NLP) task that identifies the emotional tone expressed in text.
 
-Given a review, the model converts its words into numerical token IDs, maps them to dense vectors using an embedding layer, processes the sequence with an LSTM, and predicts one of two sentiment classes:
+This repository explores two approaches to binary sentiment classification. The traditional machine learning implementation converts reviews into TF-IDF features and uses Logistic Regression. The deep learning implementation converts tokens into embeddings and processes review sequences with an LSTM neural network.
 
-- **Negative (0)**
-- **Positive (1)**
-
-The trained model weights and vocabulary are saved so that predictions can be made without retraining the network.
-
-## Technologies
-
-- Python
-- PyTorch
-- NumPy
-- Pandas
-- Scikit-learn
-- NLTK
-- Hugging Face Datasets
-- Matplotlib
-- Seaborn
-- Jupyter Notebook
-
-## Dataset
-
-This project uses the IMDb movie review dataset from Hugging Face:
+Both implementations use the IMDb movie review dataset from Hugging Face:
 
 `stanfordnlp/imdb`
 
-Dataset statistics:
-
-- Training samples: 25,000
-- Test samples: 25,000
-- Number of classes: 2
-- Class distribution: Balanced between positive and negative reviews
-
-## Model Architecture
-
-The model consists of three main components:
-
-1. **Embedding Layer:** Maps token IDs to 100-dimensional vectors.
-2. **LSTM Layer:** Processes the review sequence with a hidden size of 64.
-3. **Linear Classifier:** Produces two output scores, one for each sentiment class.
-
-The model uses packed sequences to avoid processing padding tokens as meaningful input.
-
-### Input Processing
-
-- HTML tags are removed, and whitespace is normalized.
-- Reviews are tokenized and converted to lowercase.
-- The vocabulary contains 30,000 tokens, including padding and unknown-token entries.
-- Each review is truncated or padded to a maximum length of 300 tokens.
-- Padding tokens use ID `0`, and unknown tokens use ID `1`.
-
-## Results
-
-The model was evaluated on the 25,000-review test set.
-
-| Metric | Result |
-|---|---:|
-| Test Accuracy | 81.75% |
-| Test Loss | 0.4455 |
-| Negative Precision | 77.44% |
-| Negative Recall | 89.61% |
-| Negative F1-score | 83.08% |
-| Positive Precision | 87.67% |
-| Positive Recall | 73.89% |
-| Positive F1-score | 80.19% |
-
-### Confusion Matrix
-
-Rows represent actual labels, and columns represent predicted labels. The label order is Negative, Positive.
-
-| Actual / Predicted | Negative | Positive |
-|---|---:|---:|
-| Negative | 11,201 | 1,299 |
-| Positive | 3,264 | 9,236 |
-
-The model correctly classified 81.75% of the test reviews. Its negative-class recall was higher than its positive-class recall, indicating that it identified negative reviews more consistently in this evaluation.
-
-These results describe the current model run and may vary if the model is retrained with different settings.
+The dataset contains 25,000 training reviews and 25,000 test reviews, with balanced positive and negative classes.
 
 ## Project Structure
 
 ```text
 sentiment-analysis-deep-learning/
-├── models/
-│   ├── sentiment_lstm.pth
-│   └── vocab.json
-├── notebooks/
-│   └── 01_imdb_sentiment_analysis.ipynb
-├── src/
-│   ├── __init__.py
-│   ├── load_data.py
-│   ├── preprocess.py
-│   ├── model.py
-│   └── predict.py
+├── machine-learning/
+│   ├── data/
+│   ├── models/
+│   │   └── sentiment_model.joblib
+│   ├── notebooks/
+│   ├── src/
+│   │   ├── load_data.py
+│   │   ├── train_model.py
+│   │   └── predict.py
+│   ├── tests/
+│   ├── .gitignore
+│   ├── README.md
+│   └── requirements.txt
+├── deep-learning/
+│   ├── models/
+│   │   ├── sentiment_lstm.pth
+│   │   └── vocab.json
+│   ├── notebooks/
+│   │   └── 01_imdb_sentiment_analysis.ipynb
+│   ├── src/
+│   │   ├── __init__.py
+│   │   ├── load_data.py
+│   │   ├── model.py
+│   │   ├── preprocess.py
+│   │   └── predict.py
+│   ├── .gitignore
+│   ├── README.md
+│   └── requirements.txt
+├── comparison/
+│   ├── README.md
+│   └── model_comparison.ipynb
 ├── .gitignore
 ├── requirements.txt
 └── README.md
 ```
 
+*Note: The comparison files are planned components and may not exist yet.*
+
+## Approaches
+
+### 1. Machine Learning
+
+The machine learning implementation uses a scikit-learn pipeline consisting of:
+
+- **TF-IDF:** Converts text into numerical features using unigrams and bigrams.
+- **Logistic Regression:** Classifies the resulting feature vectors as positive or negative.
+- **Joblib:** Saves the trained pipeline for inference without retraining.
+
+Key configuration:
+
+| Parameter | Value |
+|---|---|
+| Maximum TF-IDF features | 20,000 |
+| N-gram range | `(1, 2)` |
+| Classifier | Logistic Regression |
+| Maximum iterations | 1,000 |
+| Random state | 42 |
+
+For implementation details, installation instructions, and evaluation results, see [`machine-learning/README.md`](machine-learning/README.md).
+
+### 2. Deep Learning
+
+The deep learning implementation uses a PyTorch LSTM network:
+
+- **Embedding layer:** Maps tokens to 100-dimensional vectors.
+- **LSTM layer:** Processes the review sequence with a hidden size of 64.
+- **Linear classifier:** Produces scores for the two sentiment classes.
+- **Packed sequences:** Avoids treating padding tokens as meaningful sequence input.
+
+The vocabulary contains 30,000 tokens, and reviews are padded or truncated to a maximum length of 300 tokens.
+
+The trained weights and vocabulary are saved separately, allowing predictions without retraining.
+
+For implementation details, installation instructions, and evaluation results, see [`deep-learning/README.md`](deep-learning/README.md).
+
+## Evaluation Results
+
+The following results were reported by the existing project evaluations.
+
+| Metric | Machine Learning | Deep Learning |
+|---|---:|---:|
+| Approach | TF-IDF + Logistic Regression | Embedding + LSTM |
+| Test samples | 25,000 | 25,000 |
+| Test accuracy | **88.30%** | 81.75% |
+| Test loss | Not reported | 0.4455 |
+
+The reported accuracy is higher for the traditional machine learning implementation. However, accuracy alone does not establish that one approach is universally better. A fair comparison should also consider preprocessing, training conditions, class-level metrics, inference speed, memory requirements, and reproducibility.
+
+The reported results should be treated as results from the current model runs. Before drawing a definitive conclusion, verify that both evaluations used equivalent data splits and comparable evaluation procedures.
+
 ## Installation
 
-### 1. Clone the Repository
+### Prerequisites
 
-Replace `<YOUR_GITHUB_REPOSITORY_URL>` with your repository's URL.
+- Python
+- pip
+- Internet access for the initial dataset download
+
+Clone the repository:
 
 ```bash
 git clone https://github.com/aidinpho/sentiment-analysis-deep-learning.git
 cd sentiment-analysis-deep-learning
 ```
 
-### 2. Create a Virtual Environment
+It is recommended to use a separate virtual environment for each implementation.
+
+### Machine Learning
+
+Install its dependencies from the repository root:
 
 ```bash
-python -m venv .venv
+pip install -r machine-learning/requirements.txt
 ```
 
-Activate it on Windows PowerShell:
+### Deep Learning
 
-```powershell
-.\.venv\Scripts\Activate.ps1
-```
-
-### 3. Install Dependencies
+Install its dependencies from the repository root:
 
 ```bash
-python -m pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r deep-learning/requirements.txt
 ```
 
-PyTorch installation requirements depend on your system. For GPU acceleration, install a compatible PyTorch build and CUDA-enabled dependencies. The project can also run on a CPU, although inference and training may be slower.
+**PyTorch note:** The appropriate PyTorch installation depends on your operating system and whether you intend to use a CPU or a compatible CUDA-enabled GPU.
 
-## Running Predictions
+## Usage
 
-From the project root, run:
+Run the following commands from the repository root.
+
+### Machine Learning
+
+**Train the model:**
 
 ```bash
-python -m src.predict
+python machine-learning/src/train_model.py
 ```
 
-Enter a movie review when prompted.
+**Predict sentiment:**
 
-Example:
-
-```text
-Enter a movie review: This movie was absolutely fantastic! I loved every minute of it.
-
-Sentiment: Positive
-Softmax score: 97.34%
-Device: cuda
+```bash
+python machine-learning/src/predict.py
 ```
 
-The displayed score and device may vary depending on the input and environment.
+The prediction script loads the saved TF-IDF and Logistic Regression pipeline and asks for a movie review.
 
-**Note:** The Softmax score is the model's score for its predicted class. It should not be interpreted as a calibrated probability or a guarantee that the prediction is correct.
+### Deep Learning
 
-## Model Files
+**Predict sentiment using the saved model:**
 
-The `models/` directory contains:
+```bash
+python deep-learning/src/predict.py
+```
 
-- `sentiment_lstm.pth` — the trained model weights.
-- `vocab.json` — the vocabulary mapping tokens to numerical IDs.
+The script loads the saved LSTM weights and vocabulary, preprocesses the review, and predicts its sentiment.
 
-Both files are required to run inference without retraining the model.
+For training and evaluation details, follow the notebook in `deep-learning/notebooks/`.
 
-## Training and Evaluation
+## Comparison
 
-The notebook `notebooks/01_imdb_sentiment_analysis.ipynb` documents the workflow, including:
+The `comparison/` directory is intended to contain a notebook comparing the two approaches in a consistent evaluation workflow.
 
-- Dataset exploration
-- Text preprocessing and tokenization
-- Vocabulary creation
-- Sequence padding and truncation
-- PyTorch datasets and data loaders
-- Embedding and LSTM model development
-- Training and evaluation
-- Classification metrics and sample predictions
+Potential comparison dimensions include:
 
-Open the notebook in Jupyter and execute its cells in order to follow the workflow.
+- Test accuracy and class-level precision, recall, and F1-score
+- Confusion matrices
+- Training time
+- Inference latency
+- Model size and memory requirements
+- Strengths and limitations of each approach
 
-**Important:** Training the notebook again and running its model-saving cell will overwrite the saved model and vocabulary files.
+The comparison notebook should be completed using actual measurements rather than assumed results.
+
+## Limitations
+
+- Both models perform binary sentiment classification.
+- TF-IDF does not fully capture word order or complex contextual relationships.
+- LSTM predictions can still be affected by vocabulary coverage, sequence length, and preprocessing choices.
+- Performance on other datasets may differ from the reported IMDb results.
+- The reported metrics should be verified under a consistent evaluation procedure before making definitive comparisons.
 
 ## Future Improvements
 
-Potential improvements include:
-
-- Adding a validation set and early stopping
-- Experimenting with embedding dimensions and LSTM hidden sizes
-- Evaluating different sequence lengths
-- Using pretrained word embeddings
-- Comparing LSTM performance with GRU and Transformer-based models
-- Improving generalization and probability calibration
-- Adding automated unit tests
+- Complete the model comparison notebook.
+- Add automated tests for preprocessing and inference.
+- Compare inference speed and model size.
+- Evaluate both approaches using the same test examples.
+- Experiment with alternative classifiers and neural architectures.
+- Improve reproducibility by documenting software versions and random seeds.
 
 ## License
 
-No license has been specified yet. If you plan to distribute this project for others to use, modify, or redistribute, consider adding an appropriate open-source license.
+No license has been specified yet. Add a `LICENSE` file if you intend to distribute the project under an explicit open-source license.

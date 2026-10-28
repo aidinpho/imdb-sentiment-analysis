@@ -30,3 +30,6 @@ data/
 # Operating system files
 .DS_Store
 Thumbs.db
+
+# Backup of the previous Machine Learning Git history
+machine-learning/.git_backup/

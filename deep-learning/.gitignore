@@ -1,0 +1,35 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Dataset files
+data/
+data/raw/
+data/processed/
+
+# Ignore model files by default
+models/*.pt
+models/*.pth
+models/*.pkl
+
+# Keep required trained model and vocabulary
+!models/sentiment_lstm.pth
+!models/vocab.json
+
+# Environment variables and secrets
+.env
+
+# IDE settings
+.vscode/
+
+# Operating system files
+.DS_Store
+Thumbs.db
