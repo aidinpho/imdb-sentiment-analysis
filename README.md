@@ -112,7 +112,7 @@ sentiment-analysis-deep-learning/
 Replace `<YOUR_GITHUB_REPOSITORY_URL>` with your repository's URL.
 
 ```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
+git clone https://github.com/aidinpho/sentiment-analysis-deep-learning.git
 cd sentiment-analysis-deep-learning
 ```
 
