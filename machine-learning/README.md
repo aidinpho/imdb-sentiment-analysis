@@ -171,8 +171,8 @@ machine-learning/
 If you are cloning the combined repository:
 
 ```bash
-git clone https://github.com/aidinpho/sentiment-analysis-deep-learning.git
-cd sentiment-analysis-deep-learning
+git clone https://github.com/aidinpho/imdb-sentiment-analysis.git
+cd imdb-sentiment-analysis
 ```
 
 ### 2. Install Dependencies

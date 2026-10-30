@@ -55,6 +55,7 @@ deep-learning/
 │   └── preprocess.py
 ├── README.md
 └── requirements.txt
+├── .gitignore
 ```
 
 ## Dataset
@@ -128,8 +129,9 @@ In the training experiment, the model achieved the following test results:
 
 | Metric | Result |
 |---|---:|
-| Test accuracy | 81.75% |
-| Test loss | 0.4455 |
+| Test accuracy (training evaluation) | 81.75% |
+| Test accuracy (comparison evaluation) | 81.74% |
+| Test loss (training evaluation) | 0.4455 |
 
 These results describe the recorded experiment and may vary if the model is retrained with different settings or random seeds.
 
@@ -148,8 +150,7 @@ Both files are required to load the trained model and perform predictions.
 
 ## Future Improvements
 
-- Compare the LSTM with traditional machine learning models.
-- Experiment with different embedding dimensions and sequence lengths.
+- Extend the existing comparison by testing additional ML and DL architectures.- Experiment with different embedding dimensions and sequence lengths.
 - Add more comprehensive automated tests.
 - Evaluate performance across different review lengths.
 - Explore pretrained word embeddings and transformer-based models.

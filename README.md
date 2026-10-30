@@ -1,41 +1,34 @@
 # IMDb Sentiment Analysis: Machine Learning vs Deep Learning
 
-A sentiment analysis project that compares two approaches to classifying IMDb movie reviews as **Positive** or **Negative**:
+A comparative Natural Language Processing (NLP) project that classifies IMDb movie reviews as **Positive** or **Negative** using two different approaches:
 
 - **Machine Learning:** TF-IDF + Logistic Regression
 - **Deep Learning:** PyTorch + LSTM
 
-The repository contains two independent implementations of the same sentiment analysis task, allowing their architectures, evaluation results, and practical trade-offs to be explored.
+The project includes separate implementations, saved model artifacts, prediction scripts, training notebooks, and a model comparison workflow.
 
 ## Overview
 
-Sentiment analysis is a Natural Language Processing (NLP) task that identifies the emotional tone expressed in text.
+Sentiment analysis is an NLP task that identifies the emotional tone expressed in text. This project explores how a traditional machine learning pipeline compares with a neural sequence model on the IMDb movie review dataset.
 
-This repository explores two approaches to binary sentiment classification. The traditional machine learning implementation converts reviews into TF-IDF features and uses Logistic Regression. The deep learning implementation converts tokens into embeddings and processes review sequences with an LSTM neural network.
+**Dataset:** [stanfordnlp/imdb on Hugging Face](https://huggingface.co/datasets/stanfordnlp/imdb)
 
-Both implementations use the IMDb movie review dataset from Hugging Face:
-
-`stanfordnlp/imdb`
-
-The dataset contains 25,000 training reviews and 25,000 test reviews, with balanced positive and negative classes.
+The dataset provides 25,000 training reviews and 25,000 test reviews, with balanced positive and negative classes.
 
 ## Project Structure
 
 ```text
-sentiment-analysis-deep-learning/
+imdb-sentiment-analysis/
 ├── machine-learning/
-│   ├── data/
 │   ├── models/
 │   │   └── sentiment_model.joblib
-│   ├── notebooks/
 │   ├── src/
 │   │   ├── load_data.py
-│   │   ├── train_model.py
-│   │   └── predict.py
-│   ├── tests/
-│   ├── .gitignore
+│   │   ├── predict.py
+│   │   └── train_model.py
 │   ├── README.md
 │   └── requirements.txt
+│   ├── .gitignore
 ├── deep-learning/
 │   ├── models/
 │   │   ├── sentiment_lstm.pth
@@ -46,30 +39,29 @@ sentiment-analysis-deep-learning/
 │   │   ├── __init__.py
 │   │   ├── load_data.py
 │   │   ├── model.py
-│   │   ├── preprocess.py
-│   │   └── predict.py
-│   ├── .gitignore
+│   │   ├── predict.py
+│   │   └── preprocess.py
 │   ├── README.md
 │   └── requirements.txt
+│   ├── .gitignore
 ├── comparison/
 │   ├── README.md
-│   └── model_comparison.ipynb
+│   ├── model_comparison.ipynb
+│   └── model_performance.png
 ├── .gitignore
 ├── requirements.txt
 └── README.md
 ```
 
-*Note: The comparison files are planned components and may not exist yet.*
-
 ## Approaches
 
 ### 1. Machine Learning
 
-The machine learning implementation uses a scikit-learn pipeline consisting of:
+The machine learning implementation uses a scikit-learn pipeline:
 
-- **TF-IDF:** Converts text into numerical features using unigrams and bigrams.
-- **Logistic Regression:** Classifies the resulting feature vectors as positive or negative.
-- **Joblib:** Saves the trained pipeline for inference without retraining.
+- **TF-IDF:** Converts review text into numerical features using unigrams and bigrams.
+- **Logistic Regression:** Classifies the resulting feature vectors.
+- **Joblib:** Saves the fitted pipeline for inference without retraining.
 
 Key configuration:
 
@@ -81,37 +73,51 @@ Key configuration:
 | Maximum iterations | 1,000 |
 | Random state | 42 |
 
-For implementation details, installation instructions, and evaluation results, see [`machine-learning/README.md`](machine-learning/README.md).
+See [machine-learning/README.md](machine-learning/README.md) for implementation and usage details.
 
 ### 2. Deep Learning
 
-The deep learning implementation uses a PyTorch LSTM network:
+The deep learning implementation uses a PyTorch LSTM model:
 
 - **Embedding layer:** Maps tokens to 100-dimensional vectors.
-- **LSTM layer:** Processes the review sequence with a hidden size of 64.
+- **LSTM layer:** Processes review sequences with a hidden size of 64.
+- **Packed sequences:** Handles variable-length reviews without treating padding tokens as meaningful input.
 - **Linear classifier:** Produces scores for the two sentiment classes.
-- **Packed sequences:** Avoids treating padding tokens as meaningful sequence input.
 
-The vocabulary contains 30,000 tokens, and reviews are padded or truncated to a maximum length of 300 tokens.
+The vocabulary contains 30,000 tokens, and reviews are padded or truncated to a maximum length of 300 tokens. The trained weights and vocabulary are saved separately.
 
-The trained weights and vocabulary are saved separately, allowing predictions without retraining.
+See [deep-learning/README.md](deep-learning/README.md) for implementation and usage details.
 
-For implementation details, installation instructions, and evaluation results, see [`deep-learning/README.md`](deep-learning/README.md).
+## Model Comparison
 
-## Evaluation Results
+Both saved models were evaluated on the same 25,000 IMDb test reviews using their respective preprocessing pipelines. Neither model was retrained during the comparison.
 
-The following results were reported by the existing project evaluations.
-
-| Metric | Machine Learning | Deep Learning |
+| Metric | TF-IDF + Logistic Regression | Embedding + LSTM |
 |---|---:|---:|
-| Approach | TF-IDF + Logistic Regression | Embedding + LSTM |
-| Test samples | 25,000 | 25,000 |
-| Test accuracy | **88.30%** | 81.75% |
-| Test loss | Not reported | 0.4455 |
+| Accuracy | **88.32%** | 81.74% |
+| Precision (positive class) | **88.11%** | 87.67% |
+| Recall (positive class) | **88.61%** | 73.88% |
+| F1-score (positive class) | **88.36%** | 80.19% |
+| Inference time (25,000 reviews) | **4.707 s** | 49.676 s |
+| Average latency per review | **0.188 ms** | 1.987 ms |
+| Required artifact size (MiB) | **0.887 MB** | 12.120 MB |
 
-The reported accuracy is higher for the traditional machine learning implementation. However, accuracy alone does not establish that one approach is universally better. A fair comparison should also consider preprocessing, training conditions, class-level metrics, inference speed, memory requirements, and reproducibility.
+Inference times are from a single recorded run and are indicative, not definitive benchmarks. They include preprocessing and prediction as implemented in the comparison notebook. Timing can vary with hardware, batch size, and software environment.
 
-The reported results should be treated as results from the current model runs. Before drawing a definitive conclusion, verify that both evaluations used equivalent data splits and comparable evaluation procedures.
+The LSTM inference run used CUDA acceleration, while the scikit-learn pipeline ran on CPU. Therefore, these timings are environment-specific and should not be interpreted as a hardware-controlled speed comparison.
+
+### Performance Visualization
+
+![Model performance comparison](comparison/model_performance.png)
+
+The complete methodology, confusion matrices, results, and discussion are available in the [comparison README](comparison/README.md) and [comparison notebook](comparison/model_comparison.ipynb).
+
+### Key Findings
+
+- TF-IDF + Logistic Regression achieved higher accuracy, recall, and F1-score in this experiment.
+- The LSTM achieved similar precision for the positive class, but its positive-class recall was lower.
+- The recorded Logistic Regression pipeline was faster and required smaller saved artifacts in this run.
+- These findings apply to the model configurations and evaluation procedure used here; they do not show that traditional machine learning is universally better than deep learning.
 
 ## Installation
 
@@ -124,15 +130,15 @@ The reported results should be treated as results from the current model runs. B
 Clone the repository:
 
 ```bash
-git clone https://github.com/aidinpho/sentiment-analysis-deep-learning.git
-cd sentiment-analysis-deep-learning
+git clone https://github.com/aidinpho/imdb-sentiment-analysis.git
+cd imdb-sentiment-analysis
 ```
 
 It is recommended to use a separate virtual environment for each implementation.
 
 ### Machine Learning
 
-Install its dependencies from the repository root:
+From the repository root, install the dependencies:
 
 ```bash
 pip install -r machine-learning/requirements.txt
@@ -140,77 +146,56 @@ pip install -r machine-learning/requirements.txt
 
 ### Deep Learning
 
-Install its dependencies from the repository root:
+From the repository root, install the dependencies:
 
 ```bash
 pip install -r deep-learning/requirements.txt
 ```
 
-**PyTorch note:** The appropriate PyTorch installation depends on your operating system and whether you intend to use a CPU or a compatible CUDA-enabled GPU.
+**PyTorch note:** The appropriate PyTorch installation depends on your operating system and whether you intend to use a CPU or a compatible CUDA-enabled GPU. Refer to the [official PyTorch installation selector](https://pytorch.org/get-started/locally/).
 
 ## Usage
 
-Run the following commands from the repository root.
+Run commands from the repository root.
 
 ### Machine Learning
 
-**Train the model:**
+Train the model:
 
 ```bash
 python machine-learning/src/train_model.py
 ```
 
-**Predict sentiment:**
+Predict the sentiment of a review using the saved pipeline:
 
 ```bash
 python machine-learning/src/predict.py
 ```
 
-The prediction script loads the saved TF-IDF and Logistic Regression pipeline and asks for a movie review.
-
 ### Deep Learning
 
-**Predict sentiment using the saved model:**
+Predict the sentiment of a review using the saved LSTM weights and vocabulary:
 
 ```bash
 python deep-learning/src/predict.py
 ```
 
-The script loads the saved LSTM weights and vocabulary, preprocesses the review, and predicts its sentiment.
-
-For training and evaluation details, follow the notebook in `deep-learning/notebooks/`.
-
-## Comparison
-
-The `comparison/` directory is intended to contain a notebook comparing the two approaches in a consistent evaluation workflow.
-
-Potential comparison dimensions include:
-
-- Test accuracy and class-level precision, recall, and F1-score
-- Confusion matrices
-- Training time
-- Inference latency
-- Model size and memory requirements
-- Strengths and limitations of each approach
-
-The comparison notebook should be completed using actual measurements rather than assumed results.
+For the deep learning training and evaluation workflow, see [deep-learning/notebooks/01_imdb_sentiment_analysis.ipynb](deep-learning/notebooks/01_imdb_sentiment_analysis.ipynb).
 
 ## Limitations
 
 - Both models perform binary sentiment classification.
 - TF-IDF does not fully capture word order or complex contextual relationships.
-- LSTM predictions can still be affected by vocabulary coverage, sequence length, and preprocessing choices.
+- LSTM predictions can be affected by vocabulary coverage, sequence length, and preprocessing choices.
+- Inference timings are based on single recorded runs and should not be treated as rigorous benchmarks.
 - Performance on other datasets may differ from the reported IMDb results.
-- The reported metrics should be verified under a consistent evaluation procedure before making definitive comparisons.
 
 ## Future Improvements
 
-- Complete the model comparison notebook.
 - Add automated tests for preprocessing and inference.
-- Compare inference speed and model size.
-- Evaluate both approaches using the same test examples.
-- Experiment with alternative classifiers and neural architectures.
-- Improve reproducibility by documenting software versions and random seeds.
+- Run repeated, controlled inference benchmarks.
+- Compare additional traditional and neural architectures.
+- Document software versions, random seeds, and full environment details for improved reproducibility.
 
 ## License
 
